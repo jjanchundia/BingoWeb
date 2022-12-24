@@ -1,178 +1,18 @@
 ﻿
 <button id="btnPrueba">Generar Cartones</button>
-<br/>
+<br />
 <button id="btnTirarBola">Tirar bola</button>
-
-@*@{
-    var genRandom = new Random();
-    var carton = new int[3, 9];
-
-    for (int i = 0; i < 4; i++)
-    {
-        for (int c = 0; c < 9; c++)
-        {
-            for (int f = 0; f < 3; f++)
-            {
-                int nuevoNumero = 0;
-                bool encontreUnoNuevo = false;
-
-                while (!encontreUnoNuevo)
-                {
-                    if (c == 0)
-                    {
-                        nuevoNumero = genRandom.Next(1, 10);
-                    }
-                    else if (c == 8)
-                    {
-                        nuevoNumero = genRandom.Next(80, 91);
-                    }
-                    else
-                    {
-                        nuevoNumero = genRandom.Next(c * 10, c * 10 + 10);
-                    }
-
-                    encontreUnoNuevo = true;
-                    for (int f2 = 0; f2 < 3; f2++)
-                    {
-                        if (carton[f2, c] == nuevoNumero)
-                        {
-                            encontreUnoNuevo = false;
-                            break;
-                        }
-                    }
-                }
-                carton[f, c] = nuevoNumero;
-            }
-        }
-
-        for (int c = 0; c < 9; c++)
-        {
-            for (int f = 0; f < 3; f++)
-            {
-                for (int k = f + 1; k < 3; k++)
-                {
-                    if (carton[f, c] > carton[k, c])
-                    {
-                        int aux = carton[f, c];
-                        carton[f, c] = carton[k, c];
-                        carton[k, c] = aux;
-                    }
-                }
-            }
-        }
-
-        var borrados = 0;
-        while (borrados < 12)
-        {
-            var filaBorrar = genRandom.Next(0, 3);
-            var columnaBorrar = genRandom.Next(0, 9);
-
-            if (carton[filaBorrar, columnaBorrar] == 0)
-                continue;
-
-            var cerosEnFila = 0;
-            for (int c = 0; c < 9; c++)
-            {
-                if (carton[filaBorrar, c] == 0)
-                {
-                    cerosEnFila++;
-                }
-            }
-
-            var cerosEnColumna = 0;
-            for (int f = 0; f < 3; f++)
-            {
-                if (carton[f, columnaBorrar] == 0)
-                {
-                    cerosEnColumna++;
-                }
-            }
-
-            var itemsPorColumna = new int[9];
-            for (int c = 0; c < 9; c++)
-            {
-                for (int f = 0; f < 3; f++)
-                {
-                    if (carton[f, c] != 0)
-                    {
-                        itemsPorColumna[c]++;
-                    }
-                }
-            }
-
-            var columnasConUnNumero = 0;
-            for (int c = 0; c < 9; c++)
-            {
-                if (itemsPorColumna[c] == 1)
-                {
-                    columnasConUnNumero++;
-                }
-            }
-
-            if (cerosEnFila == 4 || cerosEnColumna == 2) continue;
-
-            if (columnasConUnNumero == 3 && itemsPorColumna[columnaBorrar] != 3)
-            {
-                continue;
-            }
-
-            carton[filaBorrar, columnaBorrar] = 0;
-            borrados++;
-        }
-
-        //for (int f = 0; f < 3; f++)
-        //{
-        //    for (int c = 0; c < 9; c++)
-        //    {
-        //        if (carton[f, c] == 0)
-        //            Console.Write("    |");
-        //        else
-        //            Console.Write($" {carton[f, c]:00} |");
-        //    }
-        //}
-
-    <div class="container">
-                                                                                                <div class="row">
-                                                                                                    <div class="col-4">
-                                                                                                        <table class="table table-bordered border-primary">
-                                                                                                            @for (int f = 0; f < 3; f++)
-                        {
-                                                                                                                <tr>
-                                                                                                                    @for (int c = 0; c < 9; c++)
-                                {
-                                                                                                                        <td>
-                                                                                                                            @if (carton[f, c] == 0)
-                                        {
-
-                                        }
-                                        else
-                                        {
-                                                                                                                                @carton[f, c]
-                                        }
-                                                                                                                        </td>
-                                }
-                                                                                                                </tr>
-                        }
-                                                                                                        </table>
-                                                                                                    </div>
-                                                                                                </div>
-    </div>
-    }
-}
-*@
 
 <div class="content">
     <div class="row">
         <div class="box box-default">
             <div class="box-body">
                 <div id="divTablaDinamica">
-
                 </div>
             </div>
 
             <div class="box-footer">
                 <div class="form-group">
-                    
                 </div>
             </div>
         </div>
@@ -182,64 +22,101 @@
 <script src="~/lib/jquery/dist/jquery.js"></script>
 
 <script type="text/javascript">
+    
+    var dataB = [];
+    var array1 = [];
+    var array2 = [];
+    var array3 = [];
+    var array4 = [];
+
+    function hasDuplicates(arr) {
+        var hayDuplicados = (arr.some(x => arr.indexOf(x) !== arr.lastIndexOf(x)));
+        if ((arr.some(x => arr.indexOf(x) !== arr.lastIndexOf(x))) === true) {
+            arr.pop();
+        }
+        return hayDuplicados;
+    }
 
     $("#btnTirarBola").click(function() {
-        $.ajax({
-            url: "/Home/TirarBola",
-            type: "GET",
-            dataType: "json",
-            success: function(data) {
-                debugger
-                alert(data.bola);
+        //Verificamos repetidos, en caso de haberlos volvemos a tirar la bol
+        var numberR = 0;
+        console.log(listaBingo)
+        do {
+            console.log(dataB);
+            numberR = Math.floor(Math.random() * 91);
+            dataB.push(numberR);
+            var uniqs = dataB.filter(function(item, index, array) {
+                return array.indexOf(item) === index;
+            });
 
-                var inputs = $("#tblBingo0").find("td");
-                var inputs2 = $("#tblBingo1").find("td");
-                var inputs3 = $("#tblBingo2").find("td");
-                var inputs4 = $("#tblBingo3").find("td");
+            console.log(uniqs);
+        } while (hasDuplicates(dataB) || numberR === 0);
 
-                inputs.each(function(i) {
-                    let input = $(this).attr('id'); 
-                    let s = document.getElementById(input).innerHTML;
-                    console.log(s);
+        var inputs = $("#tblBingo0").find("td");
+        var inputs2 = $("#tblBingo1").find("td");
+        var inputs3 = $("#tblBingo2").find("td");
+        var inputs4 = $("#tblBingo3").find("td");
 
-                    if (data.bola === Number(s)) {
-                        $(`#tblBingo0_${s}`).css("background-color", "#FF0040");
-                    }
-                });
+        debugger
+        inputs.each(function(i) {
+            let input = $(this).attr('id');
+            let s = document.getElementById(input).innerHTML;
 
-                inputs2.each(function(i) {
-                    let input = $(this).attr('id'); 
-                    let s = document.getElementById(input).innerHTML;
-                    console.log(s);
-
-                    if (data.bola === Number(s)) {
-                        $(`#tblBingo1_${s}`).css("background-color", "#FF0040");
-                    }
-                });
-
-                inputs3.each(function(i) {
-                    let input = $(this).attr('id'); 
-                    var s = document.getElementById(input).innerHTML;
-                    console.log(s);
-
-                    if (data.bola === Number(s)) {
-                        $(`#tblBingo2_${s}`).css("background-color", "#FF0040");
-                    }
-                });
-
-                inputs4.each(function(i) {
-                    let input = $(this).attr('id'); 
-                    let s = document.getElementById(input).innerHTML;
-                    console.log(s);
-
-                    if (data.bola === Number(s)) {
-                        $(`#tblBingo3_${s}`).css("background-color", "#FF0040");
-                    }
-                });
+            if (numberR === Number(s)) {
+                $(`#tblBingo0_${s}`).css("background-color", "#FF0040");
+                array1.push(numberR);
             }
         });
-    });
 
+        inputs2.each(function(i) {
+            let input = $(this).attr('id');
+            let s = document.getElementById(input).innerHTML;
+
+            if (numberR === Number(s)) {
+                $(`#tblBingo1_${s}`).css("background-color", "#FF0040");
+                array2.push(numberR);
+            }
+        });
+
+        inputs3.each(function(i) {
+            let input = $(this).attr('id');
+            var s = document.getElementById(input).innerHTML;
+
+            if (numberR === Number(s)) {
+                $(`#tblBingo2_${s}`).css("background-color", "#FF0040");
+                array3.push(numberR);
+            }
+        });
+
+        inputs4.each(function(i) {
+            let input = $(this).attr('id');
+            let s = document.getElementById(input).innerHTML;
+
+            if (numberR === Number(s)) {
+                $(`#tblBingo3_${s}`).css("background-color", "#FF0040");
+                array4.push(numberR);
+            }
+        });
+
+        console.log(array1);
+        console.log(array2);
+        console.log(array3);
+        console.log(array4);
+
+        if(array1.length === 15 || array2.length === 15 || array3.length === 15|| array4.length === 15){
+            $.ajax({
+                //url: "../home/TirarBola",
+                url: '@Url.Action("TirarBola")',
+                type: "POST",
+                dataType: "json",
+                success: function(data) {
+                    
+                }
+            });
+        });
+    })
+
+    var listaBingo = [];
     $("#btnPrueba").click(function() {
         $.ajax({
             url: "/Home/ConsultaDatos",
@@ -249,23 +126,23 @@
                 debugger
                 console.log(data.dataBingoL.length);
                 console.log(data.dataBingoL);
-
+                listaBingo = data.dataBingoL;
                 $('#divTablaDinamica div').empty();
                 //Se crea elemento del DOM dinamicamente en div(dinamica)
                 $("#divTablaDinamica").append(`<div id='dinamica'></div>`);
 
-                var contenido = `<h5 class="pull-right" id='totales'><strong>Total seleccionado: </strong>&nbsp;&nbsp;`;
+                var contenido = `<h5 class="pull-right" id='totales'><strong>Bolilla: </strong>&nbsp;&nbsp;`;
                 contenido += "<br>";
-                contenido += "<div class='row'>";                
+                contenido += "<div class='row'>";
                 for (var i = 0; i < data.dataBingoL.length; i++) {
                     contenido += "<div class='col-6'>";
                     contenido += "<table id='tblBingo" + i + "' class='table table-bordered border-primary'>";
                     contenido += "<tr>";
                     //console.log(data.dataBingoL[i].data.length)
                     for (var j = 0; j < data.dataBingoL[i].data.length; j++) {
-                        if (j % 9 == 0) { 
+                        if (j % 9 == 0) {
                             contenido += "<tr>";
-                        }                        
+                        }
                         if (data.dataBingoL[i].data[j].column1 === 0) {
                             contenido += `<td id="tblBingo${i}_${data.dataBingoL[i].data[j].column1}" style='background-color: Aqua;'>`;
                         } else {
@@ -284,140 +161,5 @@
             }
         });
     });
-
-    //debugger
-    ////Random = new Random();
-    ////var random = Math.floor(1000 + Math.random() * 9000);
-    ////var carton = new int[3, 9];
-    //var carton = [];
-
-    ////generamos 4 cartones
-    //for (var i = 0; i < 2; i++) {
-    //    //Recorremos columnas x filas
-    //    //Generamos números aleatorios para el cartón.
-    //    for (var c = 0; c < 9; c++) {
-    //        for (var f = 0; f < 3; f++) {
-    //            var nuevoNumero = 0;
-    //            var encontreUnoNuevo = false;
-
-    //            while (!encontreUnoNuevo) {
-    //                if (c == 0) //columna 1
-    //                {
-    //                    nuevoNumero = Math.floor(Math.random() * 10);
-    //                    //genRandom.Next(1, 10);//Columna 1 Generamos números del 1 al 9
-    //                }
-    //                else if (c == 8) { //columna 9
-    //                    nuevoNumero = Math.floor(Math.random() * 91);
-    //                    //genRandom.Next(80, 91);//Columna 9 Generamos números del 80 al 90
-    //                }
-    //                else//todas las demas columnas
-    //                {
-    //                    nuevoNumero = Math.floor(Math.random() * 10);
-    //                    //genRandom.Next(c * 10, c * 10 + 10);
-    //                }
-
-    //                //Buscamos si el nuevo número generado existe en la columna
-    //                encontreUnoNuevo = true;
-    //                for (var f2 = 0; f2 < 3; f2++) {
-    //                    if (carton[f2, c] == nuevoNumero) {
-    //                        encontreUnoNuevo = false;
-    //                        break;
-    //                    }
-    //                }
-    //                //Si salio del bucle y no encontró repetidos,
-    //                //encontreUnoNuevo = false y sale del bucle while
-    //            }
-    //            //console.log(carton)
-    //            carton[f, c] = nuevoNumero;
-    //        }
-    //    }
-
-    //    //Ordenamos las columnas
-    //    for (var c = 0; c < 9; c++) {
-    //        for (var f = 0; f < 3; f++) {
-    //            for (var k = f + 1; k < 3; k++) {
-    //                if (carton[f, c] > carton[k, c]) {
-    //                    var aux = carton[f, c];
-    //                    carton[f, c] = carton[k, c];
-    //                    carton[k, c] = aux;
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    var borrados = 0;
-    //    while (borrados < 12) {
-    //        var filaBorrar = Math.floor(Math.random() * 3);
-    //        var columnaBorrar = Math.floor(Math.random() * 9);
-
-    //        if (carton[filaBorrar, columnaBorrar] == 0)
-    //            continue;
-
-    //        //Contamos cuantos ceros hay en esta fila.
-    //        var cerosEnFila = 0;
-    //        for (var c = 0; c < 9; c++) {
-    //            if (carton[filaBorrar, c] == 0) {
-    //                cerosEnFila++;
-    //            }
-    //        }
-
-    //        //Contamos cuantos ceros hay en esta columna.
-    //        var cerosEnColumna = 0;
-    //        for (var f = 0; f < 3; f++) {
-    //            if (carton[f, columnaBorrar] == 0) {
-    //                cerosEnColumna++;
-    //            }
-    //        }
-
-    //        //    //Contamos cuantos items tenemos
-    //        var itemsPorColumna = [];
-    //        for (var c = 0; c < 9; c++) {
-    //            for (var f = 0; f < 3; f++) {
-    //                if (carton[f, c] != 0) {
-    //                    itemsPorColumna[c]++;
-    //                }
-    //            }
-    //        }
-
-    //        //Contamos cuantas columnas hay con un solo número
-    //        var columnasConUnNumero = 0;
-    //        for (var c = 0; c < 9; c++) {
-    //            if (itemsPorColumna[c] == 1) {
-    //                columnasConUnNumero++;
-    //            }
-    //        }
-
-    //        //Si ya hay 4 ceros en la fila o
-    //        //si ya hay 2 ceros en la columna no se hace nada
-    //        if (cerosEnFila == 4 || cerosEnColumna == 2) continue;
-
-    //        //Si hay 3 columnas con 1 solo número, a partir de ahora
-    //        //debo borrar solo las columnas q tienen 3 items
-    //        if (columnasConUnNumero == 3 && itemsPorColumna[columnaBorrar] != 3) {
-    //            continue;
-    //        }
-
-    //        //    //Si no entro por las opciones anteriores borramos el número
-    //        //    carton[filaBorrar, columnaBorrar] = 0;
-    //        borrados++;
-    //    }
-
-    //    //Mostramos el cartón
-    //    for (var f = 0; f < 3; f++) {
-    //        for (var c = 0; c < 9; c++) {
-    //            if (c == 0)
-    //                var css = 1;
-    //                //console.log("|");
-
-    //                //Si es 0 mostramos espacios
-    //                if (carton[f, c] == 0)
-    //                    var sss = 0;
-    //                //console.log("    |");
-    //                else
-    //                    var sc = 0;
-    //                //console.log(`${carton[f, c]}`);
-    //        }
-    //    }
-    //}
 
 </script>
