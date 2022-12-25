@@ -1,27 +1,19 @@
 ﻿using BingoWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Web;
-using System.IO;
-using System.Text.Json;
+using BingoWeb.Rules;
 
 namespace BingoWeb.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _configuration;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
@@ -205,12 +197,12 @@ namespace BingoWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult TirarBola()
+        public IActionResult TirarBola(int[] data, int[] cartones)
         {
-            var genRandom = new Random();
-            int  nuevoNumero = genRandom.Next(1, 90);//Columna 1 Generamos números del 1 al 90
+            var rule = new BingoRules(_configuration);
+            var post = rule.GetCartones(data, cartones);
 
-            return Json(new { bola = nuevoNumero});
+            return Json(new { bola = 1 });
         }
 
         public IActionResult Privacy()

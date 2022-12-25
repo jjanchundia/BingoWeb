@@ -5,6 +5,11 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+var connectionString = builder.Configuration.GetConnectionString("BingoWeb");
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer(connectionString));  
+//builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

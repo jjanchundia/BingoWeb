@@ -28,6 +28,7 @@
     var array2 = [];
     var array3 = [];
     var array4 = [];
+    var cartonLleno = [];
 
     function hasDuplicates(arr) {
         var hayDuplicados = (arr.some(x => arr.indexOf(x) !== arr.lastIndexOf(x)));
@@ -42,14 +43,10 @@
         var numberR = 0;
         console.log(listaBingo)
         do {
-            console.log(dataB);
-            numberR = Math.floor(Math.random() * 91);
+            //numberR = Math.floor(Math.random() * 91);
+            //Generamos números del 1 al 90
+            numberR = Math.floor((Math.random() * (90 - 1 + 1)) + 1)
             dataB.push(numberR);
-            var uniqs = dataB.filter(function(item, index, array) {
-                return array.indexOf(item) === index;
-            });
-
-            console.log(uniqs);
         } while (hasDuplicates(dataB) || numberR === 0);
 
         var inputs = $("#tblBingo0").find("td");
@@ -57,63 +54,82 @@
         var inputs3 = $("#tblBingo2").find("td");
         var inputs4 = $("#tblBingo3").find("td");
 
-        debugger
-        inputs.each(function(i) {
+        inputs.each(function() {
             let input = $(this).attr('id');
-            let s = document.getElementById(input).innerHTML;
+            let posicionTd = document.getElementById(input).innerHTML;
 
-            if (numberR === Number(s)) {
-                $(`#tblBingo0_${s}`).css("background-color", "#FF0040");
+            if (numberR === Number(posicionTd)) {
+                $(`#tblBingo0_${posicionTd}`).css("background-color", "#FF0040");
                 array1.push(numberR);
             }
         });
 
-        inputs2.each(function(i) {
+        inputs2.each(function() {
             let input = $(this).attr('id');
-            let s = document.getElementById(input).innerHTML;
+            let posicionTd = document.getElementById(input).innerHTML;
 
-            if (numberR === Number(s)) {
-                $(`#tblBingo1_${s}`).css("background-color", "#FF0040");
+            if (numberR === Number(posicionTd)) {
+                $(`#tblBingo1_${posicionTd}`).css("background-color", "#FF0040");
                 array2.push(numberR);
             }
         });
 
-        inputs3.each(function(i) {
+        inputs3.each(function() {
             let input = $(this).attr('id');
-            var s = document.getElementById(input).innerHTML;
+            var posicionTd = document.getElementById(input).innerHTML;
 
-            if (numberR === Number(s)) {
-                $(`#tblBingo2_${s}`).css("background-color", "#FF0040");
+            if (numberR === Number(posicionTd)) {
+                $(`#tblBingo2_${posicionTd}`).css("background-color", "#FF0040");
                 array3.push(numberR);
             }
         });
 
-        inputs4.each(function(i) {
+        inputs4.each(function() {
             let input = $(this).attr('id');
-            let s = document.getElementById(input).innerHTML;
+            let posicionTd = document.getElementById(input).innerHTML;
 
-            if (numberR === Number(s)) {
-                $(`#tblBingo3_${s}`).css("background-color", "#FF0040");
+            if (numberR === Number(posicionTd)) {
+                $(`#tblBingo3_${posicionTd}`).css("background-color", "#FF0040");
                 array4.push(numberR);
             }
         });
+                
+        if (array1.length === 15) { 
+            cartonLleno.push(1);
+        };
+        if (array2.length === 15) {
+            cartonLleno.push(2);
+        }
+        if (array3.length === 15) { 
+            cartonLleno.push(3);
+        }
+        if (array4.length === 15) {
+            cartonLleno.push(4);
+        }
 
-        console.log(array1);
-        console.log(array2);
-        console.log(array3);
-        console.log(array4);
-
-        if(array1.length === 15 || array2.length === 15 || array3.length === 15|| array4.length === 15){
+        if (array1.length === 15 || array2.length === 15 || array3.length === 15|| array4.length === 15)
+        {
             $.ajax({
-                //url: "../home/TirarBola",
                 url: '@Url.Action("TirarBola")',
                 type: "POST",
                 dataType: "json",
+                data: { data: dataB, cartones: cartonLleno },
                 success: function(data) {
-                    
+                    if (cartonLleno.length === 1) {
+                        alert(`El Cartón Ganador es el: N° ${cartonLleno[0]}`);
+                    }
+                    if (cartonLleno.length === 2) {
+                        alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}`);
+                    }
+                    if (cartonLleno.length === 3) {
+                        alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}`);
+                    }
+                    if (cartonLleno.length === 4) {
+                        alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}, N° ${cartonLleno[3]}`);
+                    }
                 }
             });
-        });
+        }
     })
 
     var listaBingo = [];
