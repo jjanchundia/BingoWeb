@@ -1,7 +1,7 @@
 ﻿
-<button id="btnPrueba">Generar Cartones</button>
+<button id="btnGenerarCartones" class="btn btn-success">Generar Cartones</button>
 <br />
-<button id="btnTirarBola">Tirar bola</button>
+<br />
 
 <div class="content">
     <div class="row">
@@ -18,6 +18,8 @@
         </div>
     </div>
 </div>
+
+<button id="btnTirarBola" class="btn btn-primary" style="display:none;">Lanzar Bolilla</button>
 
 <script src="~/lib/jquery/dist/jquery.js"></script>
 
@@ -39,15 +41,28 @@
     }
 
     $("#btnTirarBola").click(function() {
+        $("#btnTirarBola").prop("disabled", true);
         //Verificamos repetidos, en caso de haberlos volvemos a tirar la bol
         var numberR = 0;
         console.log(listaBingo)
+
+        if (cartonLleno.length > 0) {            
+            Swal.fire({
+                icon: 'error',
+                title: 'Advertencia...',
+                text: "Partida Terminada, no puedes seguir jugando!!!"
+            });
+            return;
+        }
+
         do {
             //numberR = Math.floor(Math.random() * 91);
             //Generamos números del 1 al 90
             numberR = Math.floor((Math.random() * (90 - 1 + 1)) + 1)
             dataB.push(numberR);
         } while (hasDuplicates(dataB) || numberR === 0);
+
+        $("#bolillaId").val(numberR);
 
         var inputs = $("#tblBingo0").find("td");
         var inputs2 = $("#tblBingo1").find("td");
@@ -96,7 +111,7 @@
                 
         if (array1.length === 15) { 
             cartonLleno.push(1);
-        };
+        }
         if (array2.length === 15) {
             cartonLleno.push(2);
         }
@@ -109,71 +124,149 @@
 
         if (array1.length === 15 || array2.length === 15 || array3.length === 15|| array4.length === 15)
         {
+            $("#btnTirarBola").prop("disabled", true);
             $.ajax({
                 url: '@Url.Action("TirarBola")',
                 type: "POST",
                 dataType: "json",
                 data: { data: dataB, cartones: cartonLleno },
                 success: function(data) {
+                    dataB = [];
+                    debugger
                     if (cartonLleno.length === 1) {
-                        alert(`El Cartón Ganador es el: N° ${cartonLleno[0]}`);
+                        //alert(`El Cartón Ganador es el: N° ${cartonLleno[0]}`);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Advertencia...',
+                            text: `El Cartón Ganador es el: N° ${cartonLleno[0]}`
+                        });
                     }
                     if (cartonLleno.length === 2) {
-                        alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}`);
+                        //alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}`);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Advertencia...',
+                            text: `Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}`
+                        });
                     }
                     if (cartonLleno.length === 3) {
-                        alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}`);
+                        //alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}`);                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Advertencia...',
+                            text: `Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}`
+                        });
                     }
                     if (cartonLleno.length === 4) {
-                        alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}, N° ${cartonLleno[3]}`);
+                        //alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}, N° ${cartonLleno[3]}`);                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Advertencia...',
+                            text: `Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}, N° ${cartonLleno[3]}`
+                        });
                     }
+
+                    array1 = [];
+                    array2 = [];
+                    array3 = [];
+                    array4 = [];
+
+                    //$("#btnGenerarCartones").click();
                 }
             });
         }
+
+        $("#btnTirarBola").prop("disabled", false);
     })
 
     var listaBingo = [];
-    $("#btnPrueba").click(function() {
-        $.ajax({
-            url: "/Home/ConsultaDatos",
-            type: "GET",
-            dataType: "json",
-            success: function(data) {
-                debugger
-                console.log(data.dataBingoL.length);
-                console.log(data.dataBingoL);
-                listaBingo = data.dataBingoL;
-                $('#divTablaDinamica div').empty();
-                //Se crea elemento del DOM dinamicamente en div(dinamica)
-                $("#divTablaDinamica").append(`<div id='dinamica'></div>`);
+    $("#btnGenerarCartones").click(function() {
 
-                var contenido = `<h5 class="pull-right" id='totales'><strong>Bolilla: </strong>&nbsp;&nbsp;`;
-                contenido += "<br>";
-                contenido += "<div class='row'>";
-                for (var i = 0; i < data.dataBingoL.length; i++) {
-                    contenido += "<div class='col-6'>";
-                    contenido += "<table id='tblBingo" + i + "' class='table table-bordered border-primary'>";
-                    contenido += "<tr>";
-                    //console.log(data.dataBingoL[i].data.length)
-                    for (var j = 0; j < data.dataBingoL[i].data.length; j++) {
-                        if (j % 9 == 0) {
+        $("#btnTirarBola").prop("disabled", false);
+
+        if (dataB.length > 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Advertencia...',
+                text: "No puedes volver a generar los cartones mientras no terminas la partida actual!!!"
+            });
+            return;
+        }
+
+        let timerInterval
+        Swal.fire({
+            title: 'Generando nuevos cartones',
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: () => {
+                Swal.showLoading()
+                const b = Swal.getHtmlContainer().querySelector('b')
+                timerInterval = setInterval(() => {
+                    //b.textContent = Swal.getTimerLeft()
+                }, 100)
+            },
+            willClose: () => {
+                clearInterval(timerInterval);
+
+                array1 = [];
+                array2 = [];
+                array3 = [];
+                array4 = [];
+                cartonLleno = [];
+
+                $.ajax({
+                    url: "/Home/ConsultaDatos",
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        console.log(data.dataBingoL.length);
+                        console.log(data.dataBingoL);
+                        listaBingo = data.dataBingoL;
+                        $('#divTablaDinamica div').empty();
+                        //Se crea elemento del DOM dinamicamente en div(dinamica)
+                        $("#divTablaDinamica").append(`<div id='dinamica'></div>`);
+
+                        var contenido = `<h5 class="pull-right" id='bolilla'><strong>Bolilla: </strong>&nbsp;&nbsp;`;
+                        contenido += "<div><input id='bolillaId' style='text-align:center' size='5' disabled />";
+                        contenido += `<h5 class="pull-right" id=''><strong>Cartón Ganador: </strong>&nbsp;&nbsp;`;
+                        contenido += "<input id='cartonGanador' style='text-align:center' size='5' disabled /></div>";
+                        contenido += "</h5>";
+                        contenido += "<br>";
+                        contenido += "<div class='row'>";
+                        for (var i = 0; i < data.dataBingoL.length; i++) {
+                            contenido += "<div class='col-6'>";
+                            contenido += "<table id='tblBingo" + i + "' class='table table-bordered border-primary'>";
                             contenido += "<tr>";
+                            //console.log(data.dataBingoL[i].data.length)
+                            for (var j = 0; j < data.dataBingoL[i].data.length; j++) {
+                                if (j % 9 == 0) {
+                                    contenido += "<tr>";
+                                }
+                                if (data.dataBingoL[i].data[j].column1 === 0) {
+                                    contenido += `<td id="tblBingo${i}_${data.dataBingoL[i].data[j].column1}" style='background-color: Aqua;'>`;
+                                } else {
+                                    contenido += `<td id="tblBingo${i}_${data.dataBingoL[i].data[j].column1}">`;
+                                    contenido += data.dataBingoL[i].data[j].column1;
+                                }
+                                contenido += "</td>";
+                            }
+                            contenido += "</tr>";
+                            contenido += "</table>";
+                            contenido += '</div>';
                         }
-                        if (data.dataBingoL[i].data[j].column1 === 0) {
-                            contenido += `<td id="tblBingo${i}_${data.dataBingoL[i].data[j].column1}" style='background-color: Aqua;'>`;
-                        } else {
-                            contenido += `<td id="tblBingo${i}_${data.dataBingoL[i].data[j].column1}">`;
-                            contenido += data.dataBingoL[i].data[j].column1;
-                        }
-                        contenido += "</td>";
+                        //contenido += '</div>';
+                        contenido += '</div>';
+                        document.getElementById("dinamica").innerHTML = contenido;
+
+                        $("#btnTirarBola").show();
                     }
-                    contenido += "</tr>";
-                    contenido += "</table>";
-                    contenido += '</div>';
-                }
-                //contenido += '</div>';
-                contenido += '</div>';
-                document.getElementById("dinamica").innerHTML = contenido;
+                });
+
+            }
+        }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === Swal.DismissReason.timer) {
+                console.log('I was closed by the timer')
             }
         });
     });
