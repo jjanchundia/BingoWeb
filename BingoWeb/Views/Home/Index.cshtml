@@ -1,15 +1,15 @@
 ﻿
-<button id="btnGenerarCartones" class="btn btn-success">Generar Cartones</button>
-<br />
-<br />
+<div class="container">
+        <button id="btnGenerarCartones" class="btn btn-success">Generar Cartones</button>
+        <br />
+        <br />
 
-<div class="content">
     <div class="row">
         <div class="box box-default">
             <div class="box-body">
                 <div id="divTablaDinamica">
                 </div>
-            </div>
+            </div>            
 
             <div class="box-footer">
                 <div class="form-group">
@@ -17,20 +17,21 @@
             </div>
         </div>
     </div>
+    
+    <button id="btnTirarBola" class="btn btn-primary" style="display:none;">Lanzar Bolilla</button>
+
 </div>
-
-<button id="btnTirarBola" class="btn btn-primary" style="display:none;">Lanzar Bolilla</button>
-
 <script src="~/lib/jquery/dist/jquery.js"></script>
 
 <script type="text/javascript">
-    
+
     var dataB = [];
     var array1 = [];
     var array2 = [];
     var array3 = [];
     var array4 = [];
     var cartonLleno = [];
+    var cartonGanadorTexto = "";
 
     function hasDuplicates(arr) {
         var hayDuplicados = (arr.some(x => arr.indexOf(x) !== arr.lastIndexOf(x)));
@@ -41,12 +42,12 @@
     }
 
     $("#btnTirarBola").click(function() {
-        $("#btnTirarBola").prop("disabled", true);
+        //$("#btnTirarBola").prop("disabled", true);
         //Verificamos repetidos, en caso de haberlos volvemos a tirar la bol
         var numberR = 0;
-        console.log(listaBingo)
+        //console.log(listaBingo)
 
-        if (cartonLleno.length > 0) {            
+        if (cartonLleno.length > 0) {
             Swal.fire({
                 icon: 'error',
                 title: 'Advertencia...',
@@ -108,22 +109,41 @@
                 array4.push(numberR);
             }
         });
-                
-        if (array1.length === 15) { 
+
+        if (array1.length === 15) {
             cartonLleno.push(1);
         }
         if (array2.length === 15) {
             cartonLleno.push(2);
         }
-        if (array3.length === 15) { 
+        if (array3.length === 15) {
             cartonLleno.push(3);
         }
         if (array4.length === 15) {
             cartonLleno.push(4);
         }
 
-        if (array1.length === 15 || array2.length === 15 || array3.length === 15|| array4.length === 15)
-        {
+        if (cartonLleno.length > 0) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Partida Terminada',
+                text: "Partida Terminada!!!"
+            });
+        }
+
+        for  (var c = 0; c < cartonLleno.length; c++)  {
+            if  (cartonLleno.length == 1)  {
+                cartonGanadorTexto = cartonLleno[c].toString();
+            }
+            if  (cartonLleno.length > 1)  {
+                cartonGanadorTexto = cartonLleno[c].toString() + ",";
+                cartonGanadorTexto = cartonGanadorTexto.substr(0, cartonGanadorTexto.length - 1);
+            }
+        }
+
+        $("#cartonGanador").val(cartonGanadorTexto);
+
+        if (array1.length === 15 || array2.length === 15 || array3.length === 15  || array4.length === 15) {
             $("#btnTirarBola").prop("disabled", true);
             $.ajax({
                 url: '@Url.Action("TirarBola")',
@@ -134,34 +154,30 @@
                     dataB = [];
                     debugger
                     if (cartonLleno.length === 1) {
-                        //alert(`El Cartón Ganador es el: N° ${cartonLleno[0]}`);
                         Swal.fire({
-                            icon: 'error',
+                            icon: 'info',
                             title: 'Advertencia...',
                             text: `El Cartón Ganador es el: N° ${cartonLleno[0]}`
                         });
                     }
                     if (cartonLleno.length === 2) {
-                        //alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}`);
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Advertencia...',
+                            icon: 'info',
+                            title: 'Cartón Ganador',
                             text: `Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}`
                         });
                     }
                     if (cartonLleno.length === 3) {
-                        //alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}`);                        
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Advertencia...',
+                            icon: 'info',
+                            title: 'Cartón Ganador',
                             text: `Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}`
                         });
                     }
                     if (cartonLleno.length === 4) {
-                        //alert(`Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}, N° ${cartonLleno[3]}`);                        
                         Swal.fire({
-                            icon: 'error',
-                            title: 'Advertencia...',
+                            icon: 'info',
+                            title: 'Cartón Ganador',
                             text: `Los Cartones ganadores son los: N° ${cartonLleno[0]}, N° ${cartonLleno[1]}, N° ${cartonLleno[2]}, N° ${cartonLleno[3]}`
                         });
                     }
@@ -219,22 +235,30 @@
                     type: "GET",
                     dataType: "json",
                     success: function(data) {
-                        console.log(data.dataBingoL.length);
-                        console.log(data.dataBingoL);
+                        //console.log(data.dataBingoL.length);
+                        //console.log(data.dataBingoL);
                         listaBingo = data.dataBingoL;
                         $('#divTablaDinamica div').empty();
                         //Se crea elemento del DOM dinamicamente en div(dinamica)
                         $("#divTablaDinamica").append(`<div id='dinamica'></div>`);
-
-                        var contenido = `<h5 class="pull-right" id='bolilla'><strong>Bolilla: </strong>&nbsp;&nbsp;`;
-                        contenido += "<div><input id='bolillaId' style='text-align:center' size='5' disabled />";
-                        contenido += `<h5 class="pull-right" id=''><strong>Cartón Ganador: </strong>&nbsp;&nbsp;`;
-                        contenido += "<input id='cartonGanador' style='text-align:center' size='5' disabled /></div>";
-                        contenido += "</h5>";
+                        
+                        var contenido = "<div class='row'>";
+                        contenido += "<div class='col-md-2'>";
+                        contenido += "<h5 id='bolilla'><strong>Bolilla: </strong></h5>";
+                        contenido += "</div>";
+                        contenido += "<div class='col-md-4'>";
+                        contenido += "<input id='bolillaId' style='text-align:center' size='10' disabled />";
+                        contenido += "</div>";
+                        contenido += "<div class='col-md-2'>";
+                        contenido += "<h5 id=''><strong>Cartón Ganador: </strong></h5>";
+                        contenido += "</div>";
+                        contenido += "<div class='col-md-4'>";
+                        contenido += "<input id='cartonGanador' style='text-align:center' size='15' disabled /></div></div>";
+                        contenido += "</div>";
                         contenido += "<br>";
                         contenido += "<div class='row'>";
                         for (var i = 0; i < data.dataBingoL.length; i++) {
-                            contenido += "<div class='col-6'>";
+                            contenido += "<div class='col-md-6'>";
                             contenido += "<table id='tblBingo" + i + "' class='table table-bordered border-primary'>";
                             contenido += "<tr>";
                             //console.log(data.dataBingoL[i].data.length)
@@ -266,7 +290,7 @@
         }).then((result) => {
             /* Read more about handling dismissals below */
             if (result.dismiss === Swal.DismissReason.timer) {
-                console.log('I was closed by the timer')
+                //console.log('I was closed by the timer')
             }
         });
     });

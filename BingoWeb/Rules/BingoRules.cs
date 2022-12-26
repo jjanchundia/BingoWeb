@@ -12,13 +12,13 @@ namespace BingoWeb.Rules
             _configuration = configuration;
         }
 
-        public List<HistorialCartones> GetCartones(int[] dataBingo, int[] cartonLleno)
+        public void Grabar(int[] dataBingo, int[] cartonLleno)
         {
             string connectionString = _configuration.GetConnectionString("BingoWeb");
 
-            using (var connection2 = new SqlConnection(connectionString))
+            using (var connection = new SqlConnection(connectionString))
             {
-                connection2.Open();
+                connection.Open();
                 
                 //Llenamos modelo de datos, el cual pasaremos a columnas para llenar tabla HistorialCartones.
                 var data = new HistorialCartones
@@ -33,7 +33,7 @@ namespace BingoWeb.Rules
                 //Procedemos a llenar tabla HistorialCartones(Cabecera).
                 var queryInsert = "INSERT INTO HistorialCartones(FechaHora, Carton1, Carton2, Carton3, Carton4) " +
                     "Values(@fechaHora, @carton1, @carton2, @carton3, @carton4)";
-                var result = connection2.Execute(queryInsert, new
+                var result = connection.Execute(queryInsert, new
                 {
                     data.FechaHora,
                     data.Carton1,
@@ -44,20 +44,20 @@ namespace BingoWeb.Rules
 
                 //Obtenemos último IdHistorialCarton insertado para pasarle a insert de tabla HistorialBolillero
                 var query = @$"Select top 1 IdHistorialCarton from HistorialCartones order by idHistorialCarton desc";
-                var post = connection2.Query<HistorialCartones>(query);
+                var post = connection.Query<HistorialCartones>(query);
 
                 //Llenado de tabla HistorialBolillero
                 foreach (var item in dataBingo)
                 {
                     var dataHistorialBolillero = new HistorialBolillero
                     {
-                        IdHistorialCarton = post.FirstOrDefault().IdHistorialCarton,
+                        IdHistorialCarton = post.First().IdHistorialCarton,
                         FechaHora = DateTime.Now,
                         numeroBolilla = item,
                     };
                     var queryInsertHB = "INSERT INTO HistorialBolillero(IdHistorialCarton, FechaHora, numeroBolilla) " +
                         "Values(@idHistorialCarton, @fechaHora, @numeroBolilla)";
-                    var resultHB = connection2.Execute(queryInsertHB, new
+                    var resultHB = connection.Execute(queryInsertHB, new
                     {
                         dataHistorialBolillero.IdHistorialCarton,
                         dataHistorialBolillero.FechaHora,
@@ -65,8 +65,6 @@ namespace BingoWeb.Rules
                     });
                 }
             }
-
-            return new List<HistorialCartones>();
         }
     }
 }

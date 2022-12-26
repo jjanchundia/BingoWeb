@@ -200,9 +200,9 @@ namespace BingoWeb.Controllers
         public IActionResult TirarBola(int[] data, int[] cartones)
         {
             var rule = new BingoRules(_configuration);
-            var post = rule.GetCartones(data, cartones);
+            rule.Grabar(data, cartones);
 
-            return Json(new { bola = 1 });
+            return Json(new { mensaje = "OK" });
         }
 
         public IActionResult Privacy()
