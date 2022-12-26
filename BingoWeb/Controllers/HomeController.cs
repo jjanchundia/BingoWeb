@@ -22,19 +22,18 @@ namespace BingoWeb.Controllers
         }
 
         [HttpGet]
-        public IActionResult ConsultaDatos()
+        public IActionResult GenerarCartones()
         {
             //Nueva instancia de random(Valores aleatorios).
             var genRandom = new Random();
             int[,]? carton = new int[3, 9];
-            var ss = new List<DataBingo>();
             var dataBingoL = new List<DataBingoList>();
 
             int i = 0;
             //generamos 4 cartones
             for (i = 0; i < 4; i++)
             {
-                ss = new List<DataBingo>();
+                var NumerosBolillas = new List<DataBingo>();
                 //Recorremos columnas x filas
                 //Generamos números aleatorios para el cartón.
                 for (int c = 0; c < 9; c++)
@@ -173,16 +172,16 @@ namespace BingoWeb.Controllers
                         if (carton[f, c] == 0)
                         {
                             Console.Write("    |");
-                            ss.Add(new DataBingo
+                            NumerosBolillas.Add(new DataBingo
                             {
-                                Column1 = 0
+                                NumeroBolilla = 0
                             });
                         }
                         else
                         {
-                            ss.Add(new DataBingo
+                            NumerosBolillas.Add(new DataBingo
                             {
-                                Column1 = carton[f, c]
+                                NumeroBolilla = carton[f, c]
                             });
                             Console.Write($" {carton[f, c]:00} |");
                         }                        
@@ -190,14 +189,14 @@ namespace BingoWeb.Controllers
                 }
                 dataBingoL.Add(new DataBingoList
                 {
-                    data = ss
+                    data = NumerosBolillas
                 });
             }
-            return Json(new { carton2=ss, dataBingoL = dataBingoL });
+            return Json(new { dataBingoL = dataBingoL });
         }
 
         [HttpPost]
-        public IActionResult TirarBola(int[] data, int[] cartones)
+        public IActionResult Grabar(int[] data, int[] cartones)
         {
             var rule = new BingoRules(_configuration);
             rule.Grabar(data, cartones);

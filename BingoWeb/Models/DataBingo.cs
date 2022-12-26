@@ -2,6 +2,6 @@
 {
     public class DataBingo
     {
-        public int? Column1 { get; set; }
+        public int? NumeroBolilla { get; set; }
     }
 }
